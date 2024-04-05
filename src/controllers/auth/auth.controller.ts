@@ -1,19 +1,22 @@
 import { Request, Response } from 'express'
 import User from '../../models/user.entity'
 import Token from '../../models/token.entity'
+import Phone from '../../models/phone.entity'
 import bcrypt from 'bcrypt'
 
 export default class AuthController {
   static async store (req: Request, res: Response) {
-    const { name, email, password } = req.body
+    const { name, email, password, phone } = req.body
 
     if (!name) return res.status(400).json({ error: 'O nome é obrigatório' })
     if (!email) return res.status(400).json({ error: 'O email é obrigatório' })
     if (!password) return res.status(400).json({ error: 'A senha é obrigatória' })
+    if (!phone) return res.status(400).json({ error: 'O telefone é obrigatório' })
 
     const user = new User()
     user.name = name
     user.email = email
+    user.phone = phone
     // Gera a hash da senha com bcrypt - para não salvar a senha em texto puro
     user.password = bcrypt.hashSync(password, 10)
     await user.save()
@@ -22,7 +25,8 @@ export default class AuthController {
     return res.status(201).json({
       id: user.id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      phone: user.phone
     })
   }
 
